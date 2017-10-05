@@ -1,0 +1,14 @@
+version: '2.1'
+
+services:
+    php:
+        extends:
+            file: ../base.yml
+            service: app
+        container_name: php
+        image: php:fpm-alpine
+        volumes:
+            - ../../src/public_html:/var/www/html
+        restart: always
+#        ports:
+#            - 9000

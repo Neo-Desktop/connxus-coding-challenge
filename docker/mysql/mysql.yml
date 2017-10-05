@@ -1,0 +1,18 @@
+version: '2.1'
+
+services:
+    mysql:
+        extends:
+            file: ../base.yml
+            service: app
+        container_name: mysql
+        image: mysql:latest
+        volumes:
+            - ./data:/var/lib/mysql
+            - ../../src/sql-init:/docker-entrypoint-initdb.d
+        restart: always
+        environment:
+            MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+            MYSQL_DATABASE: "coding_challenge"
+#        ports:
+#            - 3306

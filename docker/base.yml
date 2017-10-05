@@ -1,0 +1,9 @@
+version: '2.1'
+
+services:
+    app:
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+        restart: always
+        environment:
+            TZ: America/Los_Angeles

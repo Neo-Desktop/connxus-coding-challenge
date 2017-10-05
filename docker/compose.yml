@@ -1,0 +1,15 @@
+version: '2.1'
+
+services:
+    nginx:
+        extends:
+            file: nginx/nginx.yml
+            service: nginx
+    mysql:
+        extends:
+            file: mysql/mysql.yml
+            service: mysql
+    php:
+        extends:
+            file: php-fpm/php.yml
+            service: php

@@ -1,0 +1,15 @@
+version: '2.1'
+
+services:
+    nginx:
+        extends:
+            file: ../base.yml
+            service: app
+        container_name: nginx
+        image: nginx:mainline-alpine
+        volumes:
+            - ./conf:/etc/nginx/conf.d
+            - ../../src/public_html:/var/www/html
+        restart: always
+        ports:
+            - 8080:80
