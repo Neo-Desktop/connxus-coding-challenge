@@ -44,9 +44,11 @@ class CompanyAddress extends BaseModel
     protected $primaryKey = 'id';
 
     /**
-     * The "type" of the auto-incrementing ID.
+     * Maps column [key] to output [value] in toArray();
      *
-     * @var string
+     * @var array
      */
-    protected $keyType = 'int';
+    protected $columnMap = [
+        'address_2' => 'address2'
+    ];
 }

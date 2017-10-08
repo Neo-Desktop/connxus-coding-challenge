@@ -2,7 +2,7 @@
 
 **Author:** [Amrit Panesar](mailto:me@amrit.be)
 
-**License:** [MIT](../blob/master/LICENSE)
+**License:** [MIT](./LICENSE)
 
 
 ## Prerequisites
@@ -21,3 +21,11 @@ These prerequisites can all be satisfied with Docker Toolbox.
 Simply run `start.sh` in your docker command-line environment.
 
 A webserver will spawn at `:8080` of your local machine or at the IP address docker-machine provisioned
+
+
+## Postman
+
+A Postman Collection and Environment file are found in the [postman](./postman) directory.
+
+The environment file has a key named `BaseURL` which points to the standard Docker-machine IP: `192.168.99.100`
+ 

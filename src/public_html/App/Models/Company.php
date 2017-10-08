@@ -36,19 +36,4 @@ class Company extends BaseModel
      * @var string
      */
     protected $primaryKey = 'id';
-
-    /**
-     * The "type" of the auto-incrementing ID.
-     *
-     * @var string
-     */
-    protected $keyType = 'int';
-
-    /**
-     * Gets the address object we want
-     */
-    public function address()
-    {
-        $this->addWith('address', CompanyAddress::class, 'id', 'company_id');
-    }
 }

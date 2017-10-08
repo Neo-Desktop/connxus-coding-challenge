@@ -33,13 +33,6 @@ abstract class BaseModel implements \ArrayAccess
     protected $primaryKey = 'id';
 
     /**
-     * The "type" of the auto-incrementing ID.
-     *
-     * @var string
-     */
-    protected $keyType = 'int';
-
-    /**
      * Attributes array, working copy
      *
      * @var array
@@ -54,11 +47,11 @@ abstract class BaseModel implements \ArrayAccess
     private $original = [];
 
     /**
-     * New objects to instantiate
+     * Maps column [key] to output [value] in toArray();
      *
      * @var array
      */
-    private $withs = [];
+    protected $columnMap = [];
 
     /**
      * A stack of "wheres"
@@ -66,18 +59,6 @@ abstract class BaseModel implements \ArrayAccess
      * @var array
      */
     private $wheres = [];
-
-    /**
-     * Fetches a table row by ID
-     *
-     * @param $index
-     *
-     * @return self
-     */
-    public static function Index($index)
-    {
-        return (new static())->getByIndex($index);
-    }
 
     /**
      * Saves an object to the DB
@@ -98,6 +79,8 @@ abstract class BaseModel implements \ArrayAccess
         $updatePlaceholders = array_map(function ($key) {
             return $key . '=?';
         }, $keys);
+        $updatePlaceholders[] = $this->primaryKey . '=LAST_INSERT_ID('
+            . $this->primaryKey . ')';
         $updatePlaceholders = implode(',', $updatePlaceholders);
 
         // generate two copies of values
@@ -121,7 +104,6 @@ abstract class BaseModel implements \ArrayAccess
         return $result;
     }
 
-
     /**
      * Conditional where routine
      *
@@ -137,13 +119,85 @@ abstract class BaseModel implements \ArrayAccess
     }
 
     /**
-     * @return $this
+     * Helper for get() and find()
+     * Generates and executes the sql stack
+     *
+     * @return PDOStatement
      */
-    public function get()
+    private function baseGetFind()
     {
         $baseSql = 'SELECT * FROM %s';
         $sprintfValues = [$this->table];
         $sqlValues = [];
+
+        // perform object filtering for wheres
+        if (count($this->wheres) > 0) {
+            $baseSql .= ' WHERE %s';
+            $sprintfValues[] = '1=1';
+
+            var_dump($this->wheres);
+
+            // first where
+            foreach ($this->wheres as $column => $value) {
+                $baseSql .= ' %s';
+                $sqlValues[] = $value;
+                $sprintfValues[] = 'AND ' . $column . '=?';
+            }
+        }
+
+        $sql = vsprintf($baseSql, $sprintfValues);
+
+        $statement = self::$connection->prepare($sql);
+        if (!$statement) {
+            echo self::$connection->errorInfo();
+        }
+        $statement->execute($sqlValues);
+
+        return $statement;
+    }
+
+    /**
+     * Executes a sql statement with an expectation for a single row
+     *
+     * @return $this
+     */
+    public function find()
+    {
+        $statement = $this->baseGetFind();
+
+        // setup output arrays
+        $this->original = $this->fetchAssociativeSingle($statement);
+        $this->attributes = $this->original;
+
+        return $this;
+    }
+
+    /**
+     * Executes a sql statement with an expectation for multiple rows
+     *
+     * @return $this
+     */
+    public function get()
+    {
+        $statement = $this->baseGetFind();
+
+        // setup output arrays
+        $this->original = $this->fetchAssociativeAll($statement);
+        $this->attributes = $this->original;
+
+        return $this;
+    }
+
+    /**
+     * Deletes a row in the DB
+     */
+    public function delete()
+    {
+        $baseSql = 'DELETE FROM %s';
+        $sprintfValues = [$this->table];
+        $sqlValues = [];
+
+        $this->wheres[$this->primaryKey] = $this{$this->primaryKey};
 
         // perform object filtering for wheres
         if (count($this->wheres) > 0) {
@@ -159,13 +213,10 @@ abstract class BaseModel implements \ArrayAccess
         if (!$statement) {
             echo self::$connection->errorInfo();
         }
+
         $statement->execute($sqlValues);
 
-        // setup output arrays
-        $this->original = $this->fetchAssociative($statement);
-        $this->attributes = $this->original;
-
-        return $this;
+        return $statement;
     }
 
     /**
@@ -188,7 +239,7 @@ abstract class BaseModel implements \ArrayAccess
         }
         $statement->execute($values);
 
-        $this->original = $this->fetchAssociative($statement);
+        $this->original = $this->fetchAssociativeSingle($statement);
         $this->attributes = $this->original;
 
         return $this;
@@ -202,19 +253,58 @@ abstract class BaseModel implements \ArrayAccess
      * @return array
      *
      */
-    public function fetchAssociative(PDOStatement $statement)
+    public function fetchAssociativeSingle(PDOStatement $statement)
     {
         return $statement->fetch(PDO::FETCH_ASSOC);
     }
 
     /**
+     * Perform a fetchAll on a PDO Statement
+     *
+     * @param PDOStatement $statement
+     *
+     * @return array
+     *
+     */
+    public function fetchAssociativeAll(PDOStatement $statement)
+    {
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * The object as represented in array fashion
+     * Applies the column mapping for display purposes
      *
      * @return array
      */
     public function toArray()
     {
-        return $this->original;
+        if (empty($this->original)) {
+            return $this->original;
+        }
+
+        $out = $this->original;
+
+        if (!is_array($this->original[0])) {
+            $out = [$out];
+        }
+
+        // apply the column map here
+        $out = array_map(function ($row) {
+            $mapOut = [];
+            foreach ($row as $key => $value) {
+                if (in_array($key, array_keys($this->columnMap))) {
+                    $key = $this->columnMap[$key];
+                }
+                $mapOut[$key] = $value;
+            }
+            return $mapOut;
+        }, $out);
+
+        if (!is_array($this->original[0])) {
+            $out = $out[0];
+        }
+        return $out;
     }
 
     /***** Magic Getters / Setters *****/

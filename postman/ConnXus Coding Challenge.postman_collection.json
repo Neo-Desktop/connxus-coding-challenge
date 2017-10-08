@@ -1,0 +1,179 @@
+{
+	"variables": [],
+	"info": {
+		"name": "ConnXus Coding Challenge",
+		"_postman_id": "287913d1-d632-80fb-0e85-88d5460a422f",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Company",
+			"description": "",
+			"item": [
+				{
+					"name": "Successful Request",
+					"request": {
+						"url": "http://{{BaseURL}}:8080/4",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Failure, Not Found",
+					"request": {
+						"url": "http://{{BaseURL}}:8080/0",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create Company",
+			"description": "",
+			"item": [
+				{
+					"name": "Successful Creation",
+					"request": {
+						"url": "http://{{BaseURL}}:8080/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\":\"Ficus International\",\n\t\"address\": \"123 Test Lane\",\n\t\"city\": \"Test\",\n\t\"state\": \"CA\",\n\t\"zip\": \"92019\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Failure, missing required fields",
+					"request": {
+						"url": "http://{{BaseURL}}:8080/",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\":\"Ficus International\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Update Company",
+			"description": "",
+			"item": [
+				{
+					"name": "Successful Update",
+					"request": {
+						"url": "http://{{BaseURL}}:8080/1",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ficus International\",\n    \"description\": null,\n    \"address\": [\n        {\n            \"id\": 1,\n            \"address\": \"123 Test Lane3\",\n            \"address2\": null,\n            \"city\": \"Test\",\n            \"state\": \"CA\",\n            \"zip\": \"92019\",\n            \"latitude\": null,\n            \"longitude\": null,\n            \"created_time\": \"2017-10-07 22:39:12\"\n        }\n    ]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Failure, Company Not Found",
+					"request": {
+						"url": "http://{{BaseURL}}:8080/0",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\":\"Ficus International\",\n\t\"address\": \"123 Test Lane\",\n\t\"city\": \"Test\",\n\t\"state\": \"CA\",\n\t\"zip\": \"92019\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Failure, Address Not Found",
+					"request": {
+						"url": "http://{{BaseURL}}:8080/2",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ficus International\",\n    \"description\": null,\n    \"address\": [\n        {\n            \"id\": 99,\n            \"address\": \"123 Test Lane3\",\n            \"address2\": null,\n            \"city\": \"Test\",\n            \"state\": \"CA\",\n            \"zip\": \"92019\",\n            \"latitude\": null,\n            \"longitude\": null,\n            \"created_time\": \"2017-10-07 22:39:12\"\n        }\n    ]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Destroy Company",
+			"description": "",
+			"item": [
+				{
+					"name": "Successful Destroy",
+					"request": {
+						"url": "http://{{BaseURL}}:8080/1",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Failure, Not Found",
+					"request": {
+						"url": "http://{{BaseURL}}:8080/0",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
