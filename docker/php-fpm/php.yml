@@ -9,6 +9,10 @@ services:
         image: php:fpm-alpine
         volumes:
             - ../../src/public_html:/var/www/html
+            - ./conf/php-fpm.d/10-env_vars.conf:/usr/local/etc/php-fpm.d/10-env_vars.conf
+            - ./init.sh:/init.sh
         restart: always
-#        ports:
+        ports:
+             - 9001
 #            - 9000
+        entrypoint: ['/bin/sh', '/init.sh']
